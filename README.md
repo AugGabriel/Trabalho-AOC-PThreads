@@ -2,6 +2,10 @@
 
 Participantes: Gabriel Augusto Pereira, João Vitor Calmon e Weverton Gomes da Silva.
 
+## Comando de compilação e execução sugerido
+
+gcc main.c -o build/main -lm && ./build/main
+
 ## Algumas recomendações para o controle de versionamento
 
 * Sempre deixe a branch `main` funcionando;
