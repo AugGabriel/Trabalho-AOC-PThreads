@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 
 int eh_primo(int entrada) {
@@ -20,7 +21,14 @@ int eh_primo(int entrada) {
 }
 
 
+int gerar_numero() {
+    return rand() % 32000;
+}
+
+
 int main() {
+    srand(1);
+
     for (int i = 0; i < 30; i++)
     {
         printf("%d:", i);
