@@ -4,6 +4,15 @@
 #include <stdlib.h>
 
 
+/**
+ * @brief Verifica se o número informado é primo.
+ * 
+ * Elimina casos excepcionais (0, 1 e 2), e testa divisores até a raíz quadrada do
+ * número para os casos convencionais.
+ * 
+ * @param entrada O número a ser testado.
+ * @return 1 se o número for primo, 0 se não for.
+ */
 int eh_primo(int entrada) {
     if (entrada < 2) {
         return 0;
@@ -21,6 +30,13 @@ int eh_primo(int entrada) {
 }
 
 
+/**
+ * @brief Gera um número aleatório de 0 a 31999.
+ * 
+ * Gera um inteiro aleatório e retorna o resto da divisão dele por 32000.
+ * 
+ * @return O número aleatório gerado.
+ */
 int gerar_numero() {
     return rand() % 32000;
 }
@@ -31,11 +47,7 @@ int main() {
 
     for (int i = 0; i < 30; i++)
     {
-        printf("%d:", i);
-        if (eh_primo(i) == 0) {
-            printf(" não");
-        }
-        printf(" é primo\n");
+        printf("%d\n", gerar_numero());
     }
     
     return 0;
