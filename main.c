@@ -54,6 +54,20 @@ int gerar_numero() {
 }
 
 
+/**
+ * @brief Cria uma matriz de inteiros com tamanho parametrizado.
+ * 
+ * Recebe os números de linhas e de colunas, e verifica os seus valores. Depois, aloca
+ * dinamicamente a memória para a matriz de inteiros com o tamanho parametrizado, com
+ * todos os valores iniciados com zero. 
+ * Cada linha é um ponteiro que aponta para uma coluna.
+ * 
+ * @param linhas O número de linhas da matriz;
+ * @param colunas O número de colunas da matriz;
+ * @return O ponteiro da matriz.
+ * 
+ * @authors Flávio Giraldeli e Gabriel Augusto.
+ */
 int **alocar_matriz_int(int linhas, int colunas) {
     // Verificação da entrada
     if (linhas < 1 || colunas < 1) {
@@ -83,6 +97,20 @@ int **alocar_matriz_int(int linhas, int colunas) {
     return (matriz);
 }
 
+
+/**
+ * @brief Libera a memória de uma matriz de inteiros.
+ * 
+ * Recebe os números de linhas e de colunas da matriz, seguidos do próprio vetor da
+ * matriz, e checa os seus valores. Depois, libera coluna por coluna da matriz, e ao
+ * final libera a própria matriz.
+ * 
+ * @param linhas O número de linhas da matriz;
+ * @param colunas O número de colunas da matriz;
+ * @param O ponteiro da matriz.
+ * 
+ * @authors Flávio Giraldeli e Gabriel Augusto.
+ */
 void liberar_matriz_int(int linhas, int colunas, float **matriz)
 {
     // Verificação das entradas
@@ -109,7 +137,7 @@ int main() {
 
     for (int i = 0; i < 30; i++)
     {
-        printf("%d\colunas", gerar_numero());
+        printf("%d\n", gerar_numero());
     }
     
     return 0;
