@@ -132,6 +132,23 @@ void liberar_matriz_int(int linhas, int colunas, int **matriz)
 }
 
 
+int **gerar_matriz(int linhas, int colunas) {
+    int **matriz = alocar_matriz_int(linhas, colunas);
+
+    if (matriz == NULL) {
+        return;
+    }
+
+    for (int i = 0; i < linhas; i++) {
+        for (int j = 0; j < colunas; j++) {
+            matriz[i][j] = gerar_numero();
+        }
+    }
+
+    return matriz;
+}
+
+
 int main() {
     srand(1);
 
