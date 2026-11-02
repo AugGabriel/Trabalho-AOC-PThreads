@@ -3,6 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Alturas e larguras da matriz e dos macro blocos.
+#define ALTURA_MATRIZ 1
+#define LARGURA_MATRIZ 1
+#define ALTURA_BLOCOS 1
+#define LARGURA_BLOCOS 1
+
 
 /**
  * @brief Verifica se o número informado é primo.

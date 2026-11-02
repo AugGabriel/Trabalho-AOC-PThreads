@@ -1,0 +1,1 @@
+Implementar validação das macros de altura e largura de matriz e macrobloco
