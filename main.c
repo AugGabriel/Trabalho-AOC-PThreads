@@ -111,7 +111,7 @@ int **alocar_matriz_int(int linhas, int colunas) {
  * 
  * @authors Flávio Giraldeli e Gabriel Augusto.
  */
-void liberar_matriz_int(int linhas, int colunas, float **matriz)
+void liberar_matriz_int(int linhas, int colunas, int **matriz)
 {
     // Verificação das entradas
     if (matriz == NULL) {
@@ -125,7 +125,7 @@ void liberar_matriz_int(int linhas, int colunas, float **matriz)
     }
 
     // Liberação da matriz
-    for(int i = 0; i < linhas; i++) {
+    for (int i = 0; i < linhas; i++) {
         free(matriz[i]);
     }
     free(matriz);
@@ -135,10 +135,17 @@ void liberar_matriz_int(int linhas, int colunas, float **matriz)
 int main() {
     srand(1);
 
-    for (int i = 0; i < 30; i++)
-    {
-        printf("%d\n", gerar_numero());
+    int linhas = 5, colunas = 5;
+    int **matriz = alocar_matriz_int(linhas, colunas);
+
+    for (int i = 0; i < linhas; i++) {
+        for (int j = 0; j < colunas; j++) {
+            printf("%d ", matriz[i][j]);
+        }
+        printf("\n");
     }
     
+    liberar_matriz_int(linhas, colunas, matriz);
+
     return 0;
 }
