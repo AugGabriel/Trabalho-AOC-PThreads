@@ -19,8 +19,7 @@
 /**
  * @brief Verifica se o número informado é primo.
  * 
- * Elimina casos excepcionais (0, 1 e 2), e testa divisores até a raíz quadrada do
- * número para os casos convencionais.
+ * Elimina casos excepcionais (0, 1 e 2), e testa divisores até a raíz quadrada do número para os casos convencionais.
  * 
  * @param entrada O número a ser testado.
  * @return 1 se o número for primo, 0 se não for.
@@ -57,9 +56,8 @@ int gerar_numero() {
 /**
  * @brief Cria uma matriz de inteiros com tamanho parametrizado.
  * 
- * Recebe os números de linhas e de colunas, e verifica os seus valores. Depois, aloca
- * dinamicamente a memória para a matriz de inteiros com o tamanho parametrizado, com
- * todos os valores iniciados com zero. 
+ * Recebe os números de linhas e de colunas, e verifica os seus valores. 
+ * Depois, aloca dinamicamente a memória para a matriz de inteiros com o tamanho parametrizado, com todos os valores iniciados com zero. 
  * Cada linha é um ponteiro que aponta para uma coluna.
  * 
  * @param linhas O número de linhas da matriz;
@@ -101,9 +99,8 @@ int **alocar_matriz_int(int linhas, int colunas) {
 /**
  * @brief Libera a memória de uma matriz de inteiros.
  * 
- * Recebe os números de linhas e de colunas da matriz, seguidos do próprio vetor da
- * matriz, e checa os seus valores. Depois, libera coluna por coluna da matriz, e ao
- * final libera a própria matriz.
+ * Recebe os números de linhas e de colunas da matriz, seguidos do próprio vetor da matriz, e checa os seus valores.
+ * Depois, libera coluna por coluna da matriz, e ao final libera a própria matriz.
  * 
  * @param linhas O número de linhas da matriz;
  * @param colunas O número de colunas da matriz;
@@ -132,6 +129,16 @@ void liberar_matriz_int(int linhas, int colunas, int **matriz)
 }
 
 
+/**
+ * @brief Gera uma matriz de números aleatórios com tamanho parametrizado.
+ * 
+ * Aloca uma matriz usando o auxiliar `alocar_matriz_int`, e verifica se ela foi alocada com sucesso. 
+ * Depois, itera por ela, preenchendo com números inteiros aleatórios, usando o auxiliar `gerar_numero`.
+ * 
+ * @param linhas O número de linhas da matriz;
+ * @param colunas O número de colunas da matriz;
+ * @return O ponteiro para a matriz gerada.
+ */
 int **gerar_matriz(int linhas, int colunas) {
     int **matriz = alocar_matriz_int(linhas, colunas);
 
