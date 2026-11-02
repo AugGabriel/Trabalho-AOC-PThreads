@@ -25,6 +25,13 @@
  * @return 1 se o número for primo, 0 se não for.
  */
 int eh_primo(int entrada) {
+    if (entrada < 0) {
+        printf(
+            "** Erro: parametro para verificacao precisa ser maior ou igual a 0 **\n"
+        );
+        return -1;
+    }
+
     if (entrada < 2) {
         return 0;
     }
@@ -143,7 +150,7 @@ int **gerar_matriz(int linhas, int colunas) {
     int **matriz = alocar_matriz_int(linhas, colunas);
 
     if (matriz == NULL) {
-        return;
+        return NULL;
     }
 
     for (int i = 0; i < linhas; i++) {
@@ -159,8 +166,16 @@ int **gerar_matriz(int linhas, int colunas) {
 int main() {
     srand(1);
 
-    int linhas = 5, colunas = 5;
-    int **matriz = alocar_matriz_int(linhas, colunas);
+    int cont_primos = 0, linhas = ALTURA_MATRIZ, colunas = LARGURA_MATRIZ;
+    int **matriz = gerar_matriz(linhas, colunas);
+
+    for (int i = 0; i < linhas; i++) {
+        for (int j = 0; j < colunas; j++) {
+            if (eh_primo(matriz[i][j])) {
+                cont_primos++;
+            }
+        }
+    }
 
     for (int i = 0; i < linhas; i++) {
         for (int j = 0; j < colunas; j++) {
@@ -168,6 +183,8 @@ int main() {
         }
         printf("\n");
     }
+
+    printf("Contagem de números primos: %d\n", cont_primos);
     
     liberar_matriz_int(linhas, colunas, matriz);
 
