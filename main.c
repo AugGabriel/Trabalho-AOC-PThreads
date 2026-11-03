@@ -10,10 +10,11 @@
     "** Erro: numeros de linhas e de colunas devem ser maiores que 0 **\n"
 
 // Alturas e larguras da matriz e dos macro blocos.
-#define ALTURA_MATRIZ 100
-#define LARGURA_MATRIZ 100
-#define ALTURA_BLOCOS 3
-#define LARGURA_BLOCOS 3
+#define ALTURA_MATRIZ 2
+#define LARGURA_MATRIZ 2
+
+#define ALTURA_BLOCOS 1
+#define LARGURA_BLOCOS 1
 
 
 /**
@@ -76,14 +77,14 @@ void verificar_tamanhos_matriz_macroblocos() {
     }
 
     // Verificação de dimensões do bloco divisíveis pelas dimensões da matriz
-    if (ALTURA_BLOCOS % ALTURA_MATRIZ == 0) {
+    if (ALTURA_MATRIZ % ALTURA_BLOCOS != 0) {
         printf(
             "** Erro: a altura dos macroblocos deve ser divisível pela altura da "
             "matriz**\n"
         );
         erro_encontrado = 1;
     }
-    if (LARGURA_BLOCOS % LARGURA_MATRIZ == 0) {
+    if (LARGURA_MATRIZ % LARGURA_BLOCOS != 0) {
         printf(
             "** Erro: a largura dos macroblocos deve ser divisível pela largura da "
             "matriz**\n"
