@@ -16,15 +16,77 @@
 #define LARGURA_BLOCOS 3
 
 
-void verificar_tamanho_macrobloco() {
-    if (
-        ALTURA_MATRIZ % ALTURA_BLOCOS != 0
-        || LARGURA_MATRIZ % LARGURA_BLOCOS != 0
-    ) {
+void verificar_tamanhos_macrobloco_matriz() {
+    int erro_encontrado = 0;
+
+    // Verificação de tamanhos maiores que zero
+    if (ALTURA_MATRIZ <= 0) {
         printf(
-            "** Erro: a altura/largura do macrobloco precisa ser divisivel"
-            "pela altura/largura da matriz **\n"
+            "** Erro: a altura da matriz deve ser maior que zero **\n"
         );
+        erro_encontrado = 1;
+    }
+    if (LARGURA_MATRIZ <= 0) {
+        printf(
+            "** Erro: a largura da matriz deve ser maior que zero **\n"
+        );
+        erro_encontrado = 1;
+    }
+
+    if (ALTURA_BLOCOS <= 0) {
+        printf(
+            "** Erro: a altura dos macroblocos deve ser maior que zero **\n"
+        );
+        erro_encontrado = 1;
+    }
+    if (LARGURA_BLOCOS <= 0) {
+        printf(
+            "** Erro: a largura dos macroblocos deve ser maior que zero **\n"
+        );
+        erro_encontrado = 1;
+    }
+
+    if (erro_encontrado) {
+        exit(EXIT_FAILURE);
+    }
+
+    // Verificação de dimensões do bloco maior que dimensões da matriz
+    if (ALTURA_BLOCOS > ALTURA_MATRIZ) {
+        printf(
+            "** Erro: a altura dos macroblocos deve ser menor ou igual à altura da "
+            "matriz**\n"
+        );
+        erro_encontrado = 1;
+    }
+    if (LARGURA_BLOCOS > LARGURA_MATRIZ) {
+        printf(
+            "** Erro: a largura dos macroblocos deve ser menor ou igual à largura da "
+            "matriz**\n"
+        );
+        erro_encontrado = 1;
+    }
+
+    if (erro_encontrado) {
+        exit(EXIT_FAILURE);
+    }
+
+    // Verificação de dimensões do bloco divisíveis pelas dimensões da matriz
+    if (ALTURA_BLOCOS % ALTURA_MATRIZ == 0) {
+        printf(
+            "** Erro: a altura dos macroblocos deve ser divisível pela altura da "
+            "matriz**\n"
+        );
+        erro_encontrado = 1;
+    }
+    if (LARGURA_BLOCOS % LARGURA_MATRIZ == 0) {
+        printf(
+            "** Erro: a largura dos macroblocos deve ser divisível pela largura da "
+            "matriz**\n"
+        );
+        erro_encontrado = 1;
+    }
+
+    if (erro_encontrado) {
         exit(EXIT_FAILURE);
     }
 }
@@ -178,7 +240,7 @@ int **gerar_matriz(int linhas, int colunas) {
 
 
 int main() {
-    verificar_tamanho_macrobloco();
+    verificar_tamanhos_macrobloco_matriz();
 
     srand(1);
 
