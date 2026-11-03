@@ -10,10 +10,24 @@
     "** Erro: numeros de linhas e de colunas devem ser maiores que 0 **\n"
 
 // Alturas e larguras da matriz e dos macro blocos.
-#define ALTURA_MATRIZ 1
-#define LARGURA_MATRIZ 1
-#define ALTURA_BLOCOS 1
-#define LARGURA_BLOCOS 1
+#define ALTURA_MATRIZ 100
+#define LARGURA_MATRIZ 100
+#define ALTURA_BLOCOS 3
+#define LARGURA_BLOCOS 3
+
+
+void verificar_tamanho_macrobloco() {
+    if (
+        ALTURA_MATRIZ % ALTURA_BLOCOS != 0
+        || LARGURA_MATRIZ % LARGURA_BLOCOS != 0
+    ) {
+        printf(
+            "** Erro: a altura/largura do macrobloco precisa ser divisivel"
+            "pela altura/largura da matriz **\n"
+        );
+        exit(EXIT_FAILURE);
+    }
+}
 
 
 /**
@@ -164,9 +178,12 @@ int **gerar_matriz(int linhas, int colunas) {
 
 
 int main() {
+    verificar_tamanho_macrobloco();
+
     srand(1);
 
-    int cont_primos = 0, linhas = ALTURA_MATRIZ, colunas = LARGURA_MATRIZ;
+    int linhas = ALTURA_MATRIZ, colunas = LARGURA_MATRIZ;
+    int cont_primos = 0;
     int **matriz = gerar_matriz(linhas, colunas);
 
     for (int i = 0; i < linhas; i++) {

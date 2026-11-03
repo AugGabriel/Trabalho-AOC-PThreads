@@ -1,1 +1,1 @@
-Implementar validação das macros de altura e largura de matriz e macrobloco
+De repente, implementar encerramentos de execução ao invés de printf em alguns casos de erro de função
