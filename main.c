@@ -16,7 +16,12 @@
 #define LARGURA_BLOCOS 3
 
 
-void verificar_tamanhos_macrobloco_matriz() {
+/**
+ * @brief Verifica se as dimensões da matriz e dos macroblocos são válidos.
+ * 
+ * Verifica se todas as dimensões são positivas, e se as dimensões dos macroblocos são menores que e divisíveis pelas dimensões da matriz.
+ */
+void verificar_tamanhos_matriz_macroblocos() {
     int erro_encontrado = 0;
 
     // Verificação de tamanhos maiores que zero
@@ -240,7 +245,7 @@ int **gerar_matriz(int linhas, int colunas) {
 
 
 int main() {
-    verificar_tamanhos_macrobloco_matriz();
+    verificar_tamanhos_matriz_macroblocos();
 
     srand(1);
 
