@@ -252,9 +252,14 @@ int **gerar_matriz(int linhas, int colunas) {
 }
 
 
-void contar_primos(int **matriz, int linhas, int colunas, int *contador) {
-    for (int i = 0; i < linhas; i++) {
-        for (int j = 0; j < colunas; j++) {
+void contar_primos(
+    int **matriz, 
+    int x_inicio, int x_limite,
+    int y_inicio, int y_limite,
+    int *contador
+) {
+    for (int i = x_inicio; i < x_limite; i++) {
+        for (int j = y_inicio; j < y_limite; j++) {
             if (eh_primo(matriz[i][j])) {
                 (*contador)++;
             }
