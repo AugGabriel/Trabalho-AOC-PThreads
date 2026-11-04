@@ -256,7 +256,7 @@ void contar_primos(int **matriz, int linhas, int colunas, int *contador) {
     for (int i = 0; i < linhas; i++) {
         for (int j = 0; j < colunas; j++) {
             if (eh_primo(matriz[i][j])) {
-                *contador++;
+                (*contador)++;
             }
         }
     }
