@@ -10,11 +10,18 @@
     "** Erro: numeros de linhas e de colunas devem ser maiores que 0 **\n"
 
 // Alturas e larguras da matriz e dos macro blocos.
-#define ALTURA_MATRIZ 2
-#define LARGURA_MATRIZ 2
+#define ALTURA_MATRIZ 5
+#define LARGURA_MATRIZ 5
 
 #define ALTURA_BLOCOS 1
 #define LARGURA_BLOCOS 1
+
+// Número de threads
+#define NUM_THREADS 4
+
+
+// Variáveis globais
+int cont_primos = 0;
 
 
 /**
@@ -245,22 +252,26 @@ int **gerar_matriz(int linhas, int colunas) {
 }
 
 
+void contar_primos(int **matriz, int linhas, int colunas, int *contador) {
+    for (int i = 0; i < linhas; i++) {
+        for (int j = 0; j < colunas; j++) {
+            if (eh_primo(matriz[i][j])) {
+                *contador++;
+            }
+        }
+    }
+}
+
+
 int main() {
     verificar_tamanhos_matriz_macroblocos();
 
     srand(1);
 
     int linhas = ALTURA_MATRIZ, colunas = LARGURA_MATRIZ;
-    int cont_primos = 0;
     int **matriz = gerar_matriz(linhas, colunas);
 
-    for (int i = 0; i < linhas; i++) {
-        for (int j = 0; j < colunas; j++) {
-            if (eh_primo(matriz[i][j])) {
-                cont_primos++;
-            }
-        }
-    }
+    contar_primos(matriz, linhas, colunas, &cont_primos);
 
     for (int i = 0; i < linhas; i++) {
         for (int j = 0; j < colunas; j++) {
