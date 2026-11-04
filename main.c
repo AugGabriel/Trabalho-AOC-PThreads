@@ -276,7 +276,16 @@ int main() {
     int linhas = ALTURA_MATRIZ, colunas = LARGURA_MATRIZ;
     int **matriz = gerar_matriz(linhas, colunas);
 
-    contar_primos(matriz, linhas, colunas, &cont_primos);
+    for (int i = 0; i < ALTURA_MATRIZ; i += ALTURA_BLOCOS) {
+        for (int j = 0; j < LARGURA_MATRIZ; j += LARGURA_BLOCOS) {
+            contar_primos(
+                matriz, 
+                i, i + ALTURA_BLOCOS, 
+                j, j + LARGURA_BLOCOS, 
+                &cont_primos
+            );
+        }
+    }
 
     for (int i = 0; i < linhas; i++) {
         for (int j = 0; j < colunas; j++) {
