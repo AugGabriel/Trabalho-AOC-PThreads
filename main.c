@@ -25,6 +25,10 @@ int cont_primos = 0;
 int **matriz;
 
 
+// Structs
+/**
+ * @brief Struct para armazenar argumentos para passar para a rotina da thread.
+ */
 typedef struct args_rotina {
     int x_inicio;
     int x_limite;
@@ -33,7 +37,20 @@ typedef struct args_rotina {
 } ArgsRotina;
 
 
-ArgsRotina *instanciar_args(
+// Funções
+
+/**
+ * @brief Cria um novo struct de argumentos para a rotina da thread.
+ * 
+ * Aloca espaço para novo struct e repassa os valores dos parâmetros para ele.
+ * 
+ * @param x_inicio A coordenada x de início do macrobloco (inclusivo);
+ * @param x_limite A coordenada x limite do macrobloco (exclusivo);
+ * @param y_inicio A coordenada y de início do macrobloco (inclusivo);
+ * @param y_limite A coordenada y limite do macrobloco (exclusivo);
+ * @return Um ponteiro para o struct recém criado.
+ */
+ArgsRotina *criar_args(
     int x_inicio,
     int x_limite,
     int y_inicio,
@@ -309,6 +326,13 @@ int contar_primos(
 }
 
 
+/**
+ * @brief A rotina para ser passada para a thread.
+ * 
+ * Recebe o struct de argumentos, chama a contagem de primos e incrementa a variável global.
+ * 
+ * @param param O struct de argumentos da rotina, que serão passados para a função de contagem de primos.
+ */
 void *rotina(void *param) {
     ArgsRotina *args_rotina = (ArgsRotina*)param;
 
@@ -332,7 +356,7 @@ int main() {
     pthread_t thread;
 
     pthread_create(
-        &thread, NULL, rotina, instanciar_args(0, LARGURA_MATRIZ, 0, ALTURA_MATRIZ)
+        &thread, NULL, rotina, criar_args(0, LARGURA_MATRIZ, 0, ALTURA_MATRIZ)
     );
     pthread_join(thread, NULL);
 
