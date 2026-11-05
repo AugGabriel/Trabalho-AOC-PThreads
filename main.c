@@ -25,6 +25,31 @@ int cont_primos = 0;
 int **matriz;
 
 
+typedef struct args_rotina {
+    int x_inicio;
+    int x_limite;
+    int y_inicio;
+    int y_limite;
+} ArgsRotina;
+
+
+ArgsRotina *instanciar_args(
+    int x_inicio,
+    int x_limite,
+    int y_inicio,
+    int y_limite
+) {
+    ArgsRotina *args_rotina = (ArgsRotina*)malloc(sizeof(ArgsRotina*));
+
+    args_rotina->x_inicio = x_inicio;
+    args_rotina->x_limite = x_limite;
+    args_rotina->y_inicio = y_inicio;
+    args_rotina->y_limite = y_limite;
+
+    return args_rotina;
+}
+
+
 /**
  * @brief Verifica se as dimensões da matriz e dos macroblocos são válidos.
  * 
@@ -284,12 +309,32 @@ int contar_primos(
 }
 
 
+void *rotina(void *param) {
+    ArgsRotina *args_rotina = (ArgsRotina*)param;
+
+    cont_primos += contar_primos(
+        matriz,
+        args_rotina->x_inicio,
+        args_rotina->x_limite,
+        args_rotina->y_inicio,
+        args_rotina->y_limite
+    );
+
+    pthread_exit(0);
+}
+
+
 int main() {
     verificar_tamanhos_matriz_macroblocos();
     srand(1);
     matriz = gerar_matriz(ALTURA_MATRIZ, LARGURA_MATRIZ);
 
-    pthread_t threads[NUM_THREADS];
+    pthread_t thread;
+
+    pthread_create(
+        &thread, NULL, rotina, instanciar_args(0, LARGURA_MATRIZ, 0, ALTURA_MATRIZ)
+    );
+    pthread_join(thread, NULL);
 
     printf("Contagem de números primos: %d\n", cont_primos);
     
