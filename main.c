@@ -24,7 +24,6 @@
 int cont_primos = 0;
 int **matriz;
 int blocos_livres;
-int quant_blocos_altura, quant_blocos_largura;
 
 
 // Funções
@@ -289,11 +288,16 @@ int contar_primos(
 
 
 /**
- * @brief A rotina para ser passada para a thread.
+ * @brief A rotina para ser passada para a thread, que efetivamente conta a quantidade de primos no macrobloco especificado.
  * 
- * Recebe o struct de argumentos, chama a contagem de primos e incrementa a variável global.
+ * Obtém a posição inicial do macrobloco a partir da quantidade de blocos livres, e conta a quantidade de primos no macrobloco.
  * 
- * @param param O struct de argumentos da rotina, que serão passados para a função de contagem de primos.
+ * A posição inicial é obtida pelo índex do macrobloco. Esse índice é ordenado dando prioridade à linha, depois à coluna, nesse seguinte modelo:
+ * ├───┬───┐
+ * | 1 | 2 |
+ * ├───┼───|
+ * | 3 | 4 |
+ * └───┴───|
  */
 void *rotina(void *param) {
     int indice_bloco = --blocos_livres;
