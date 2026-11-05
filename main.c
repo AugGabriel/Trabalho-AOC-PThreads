@@ -13,15 +13,16 @@
 #define ALTURA_MATRIZ 9
 #define LARGURA_MATRIZ 9
 
-#define ALTURA_BLOCOS 1
-#define LARGURA_BLOCOS 1
+#define ALTURA_BLOCOS 3
+#define LARGURA_BLOCOS 3
 
 // Número de threads
-#define NUM_THREADS 4
+#define NUM_THREADS 9
 
 
 // Variáveis globais
 int cont_primos = 0;
+int **matriz;
 
 
 /**
@@ -285,32 +286,14 @@ int contar_primos(
 
 int main() {
     verificar_tamanhos_matriz_macroblocos();
-
     srand(1);
+    matriz = gerar_matriz(ALTURA_MATRIZ, LARGURA_MATRIZ);
 
-    int linhas = ALTURA_MATRIZ, colunas = LARGURA_MATRIZ;
-    int **matriz = gerar_matriz(linhas, colunas);
-
-    for (int i = 0; i < ALTURA_MATRIZ; i += ALTURA_BLOCOS) {
-        for (int j = 0; j < LARGURA_MATRIZ; j += LARGURA_BLOCOS) {
-            cont_primos += contar_primos(
-                matriz, 
-                i, i + ALTURA_BLOCOS, 
-                j, j + LARGURA_BLOCOS
-            );
-        }
-    }
-
-    for (int i = 0; i < linhas; i++) {
-        for (int j = 0; j < colunas; j++) {
-            printf("%d ", matriz[i][j]);
-        }
-        printf("\n");
-    }
+    pthread_t threads[NUM_THREADS];
 
     printf("Contagem de números primos: %d\n", cont_primos);
     
-    liberar_matriz_int(linhas, colunas, matriz);
+    liberar_matriz_int(ALTURA_MATRIZ, LARGURA_MATRIZ, matriz);
 
     return 0;
 }
