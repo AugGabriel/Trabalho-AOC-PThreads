@@ -10,8 +10,8 @@
     "** Erro: numeros de linhas e de colunas devem ser maiores que 0 **\n"
 
 // Alturas e larguras da matriz e dos macro blocos.
-#define ALTURA_MATRIZ 5
-#define LARGURA_MATRIZ 5
+#define ALTURA_MATRIZ 9
+#define LARGURA_MATRIZ 9
 
 #define ALTURA_BLOCOS 1
 #define LARGURA_BLOCOS 1
@@ -252,19 +252,34 @@ int **gerar_matriz(int linhas, int colunas) {
 }
 
 
-void contar_primos(
+/** 
+ * @brief Conta o número de primos no macrobloco da matriz, retornando a quantidade.
+ * 
+ * Dadas as coordenadas de início do macrobloco (inclusivo) e as coordenadas limite (exclusivo), retorna a quantidade de números primos no macrobloco.
+ * 
+ * @param matriz O ponteiro para a matriz de inteiros;
+ * @param x_inicio A coordenada x de início do macrobloco (inclusivo);
+ * @param x_limite A coordenada x limite do macrobloco (exclusivo);
+ * @param y_inicio A coordenada y de início do macrobloco (inclusivo);
+ * @param y_limite A coordenada y limite do macrobloco (exclusivo);
+ * @return A contagem de números primos na matriz contidos no macrobloco.
+ */
+int contar_primos(
     int **matriz, 
     int x_inicio, int x_limite,
-    int y_inicio, int y_limite,
-    int *contador
+    int y_inicio, int y_limite
 ) {
+    int contador = 0;
+
     for (int i = x_inicio; i < x_limite; i++) {
         for (int j = y_inicio; j < y_limite; j++) {
             if (eh_primo(matriz[i][j])) {
-                (*contador)++;
+                contador++;
             }
         }
     }
+
+    return contador;
 }
 
 
@@ -278,11 +293,10 @@ int main() {
 
     for (int i = 0; i < ALTURA_MATRIZ; i += ALTURA_BLOCOS) {
         for (int j = 0; j < LARGURA_MATRIZ; j += LARGURA_BLOCOS) {
-            contar_primos(
+            cont_primos += contar_primos(
                 matriz, 
                 i, i + ALTURA_BLOCOS, 
-                j, j + LARGURA_BLOCOS, 
-                &cont_primos
+                j, j + LARGURA_BLOCOS
             );
         }
     }
