@@ -10,11 +10,11 @@
     "** Erro: numeros de linhas e de colunas devem ser maiores que 0 **\n"
 
 // Alturas e larguras da matriz e dos macro blocos.
-#define ALTURA_MATRIZ 9
-#define LARGURA_MATRIZ 9
+#define ALTURA_MATRIZ 6
+#define LARGURA_MATRIZ 6
 
-#define ALTURA_BLOCOS 3
-#define LARGURA_BLOCOS 3
+#define ALTURA_BLOCOS 6
+#define LARGURA_BLOCOS 6
 
 // Número de threads
 #define NUM_THREADS 9
@@ -23,49 +23,11 @@
 // Variáveis globais
 int cont_primos = 0;
 int **matriz;
-
-
-// Structs
-/**
- * @brief Struct para armazenar argumentos para passar para a rotina da thread.
- */
-typedef struct args_rotina {
-    int x_inicio;
-    int x_limite;
-    int y_inicio;
-    int y_limite;
-} ArgsRotina;
+int blocos_livres;
+int quant_blocos_altura, quant_blocos_largura;
 
 
 // Funções
-
-/**
- * @brief Cria um novo struct de argumentos para a rotina da thread.
- * 
- * Aloca espaço para novo struct e repassa os valores dos parâmetros para ele.
- * 
- * @param x_inicio A coordenada x de início do macrobloco (inclusivo);
- * @param x_limite A coordenada x limite do macrobloco (exclusivo);
- * @param y_inicio A coordenada y de início do macrobloco (inclusivo);
- * @param y_limite A coordenada y limite do macrobloco (exclusivo);
- * @return Um ponteiro para o struct recém criado.
- */
-ArgsRotina *criar_args(
-    int x_inicio,
-    int x_limite,
-    int y_inicio,
-    int y_limite
-) {
-    ArgsRotina *args_rotina = (ArgsRotina*)malloc(sizeof(ArgsRotina*));
-
-    args_rotina->x_inicio = x_inicio;
-    args_rotina->x_limite = x_limite;
-    args_rotina->y_inicio = y_inicio;
-    args_rotina->y_limite = y_limite;
-
-    return args_rotina;
-}
-
 
 /**
  * @brief Verifica se as dimensões da matriz e dos macroblocos são válidos.
@@ -334,14 +296,13 @@ int contar_primos(
  * @param param O struct de argumentos da rotina, que serão passados para a função de contagem de primos.
  */
 void *rotina(void *param) {
-    ArgsRotina *args_rotina = (ArgsRotina*)param;
+    int indice_bloco = --blocos_livres;
+
+    int x = (indice_bloco % (LARGURA_MATRIZ / LARGURA_BLOCOS)) * LARGURA_BLOCOS;
+    int y = (indice_bloco / (ALTURA_MATRIZ / ALTURA_BLOCOS)) * ALTURA_BLOCOS;
 
     cont_primos += contar_primos(
-        matriz,
-        args_rotina->x_inicio,
-        args_rotina->x_limite,
-        args_rotina->y_inicio,
-        args_rotina->y_limite
+        matriz, x, x + LARGURA_BLOCOS, y, y + ALTURA_BLOCOS
     );
 
     pthread_exit(0);
@@ -349,20 +310,26 @@ void *rotina(void *param) {
 
 
 int main() {
+    // Inicializações
     verificar_tamanhos_matriz_macroblocos();
     srand(1);
+
     matriz = gerar_matriz(ALTURA_MATRIZ, LARGURA_MATRIZ);
+    blocos_livres = (ALTURA_MATRIZ * LARGURA_MATRIZ) \
+                    / (ALTURA_BLOCOS * LARGURA_BLOCOS);
 
-    pthread_t thread;
-
-    pthread_create(
-        &thread, NULL, rotina, criar_args(0, LARGURA_MATRIZ, 0, ALTURA_MATRIZ)
-    );
-    pthread_join(thread, NULL);
+    // Corpo
+    while (blocos_livres > 0) {
+        pthread_t thread;
+        pthread_create(&thread, NULL, rotina, NULL);
+        pthread_join(thread, NULL);
+    }
 
     printf("Contagem de números primos: %d\n", cont_primos);
     
+    // Liberações
     liberar_matriz_int(ALTURA_MATRIZ, LARGURA_MATRIZ, matriz);
 
+    // Retorno
     return 0;
 }
