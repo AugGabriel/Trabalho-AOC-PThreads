@@ -128,7 +128,7 @@ int eh_primo(int entrada) {
         printf(
             "** Erro: parametro para verificacao precisa ser maior ou igual a 0 **\n"
         );
-        return -1;
+        exit(EXIT_FAILURE);
     }
 
     if (entrada < 2) {
@@ -176,7 +176,7 @@ int **alocar_matriz_int(int linhas, int colunas) {
     // Verificação da entrada
     if (linhas < 1 || colunas < 1) {
         printf(ERRO_LINHAS_COLUNAS_NAO_POSITIVO);
-        return(NULL);
+        exit(EXIT_FAILURE);
     }
     
     // Alocação das linhas da matriz
@@ -184,7 +184,7 @@ int **alocar_matriz_int(int linhas, int colunas) {
 
     if (matriz == NULL) {
         printf(ERRO_ALOCACAO_MEMORIA);
-        return (NULL);
+        exit(EXIT_FAILURE);
     }
 
     // Alocação das colunas da matriz
@@ -193,7 +193,7 @@ int **alocar_matriz_int(int linhas, int colunas) {
 
         if (matriz[i] == NULL) {
             printf(ERRO_ALOCACAO_MEMORIA);
-            return (NULL);
+            exit(EXIT_FAILURE);
         }
     }
 
@@ -219,12 +219,12 @@ void liberar_matriz_int(int linhas, int colunas, int **matriz)
     // Verificação das entradas
     if (matriz == NULL) {
         printf("** Erro: matriz nao definida **\n");
-        return;
+        exit(EXIT_FAILURE);;
     }
 
     if (linhas < 1 || colunas < 1) {
         printf(ERRO_LINHAS_COLUNAS_NAO_POSITIVO);
-        return;
+        exit(EXIT_FAILURE);;
     }
 
     // Liberação da matriz
@@ -247,10 +247,6 @@ void liberar_matriz_int(int linhas, int colunas, int **matriz)
  */
 int **gerar_matriz(int linhas, int colunas) {
     int **matriz = alocar_matriz_int(linhas, colunas);
-
-    if (matriz == NULL) {
-        return NULL;
-    }
 
     for (int i = 0; i < linhas; i++) {
         for (int j = 0; j < colunas; j++) {
@@ -279,6 +275,17 @@ int contar_primos(
     int x_inicio, int x_limite,
     int y_inicio, int y_limite
 ) {
+    if (x_inicio < 0 || x_limite < 0 || y_inicio < 0 || y_limite < 0) {
+        printf(
+            "Todas as entradas de inteiro da função `contar_primos` precisam ser"
+            " positivas. Valores: \n"
+        );
+        printf("Coordenadas iniciais: %d, %d\n", x_inicio, y_inicio);
+        printf("Coordenadas limite: %d, %d\n", x_limite, y_limite);
+        
+        exit(EXIT_FAILURE);
+    }
+
     int contador = 0;
 
     for (int i = x_inicio; i < x_limite; i++) {
