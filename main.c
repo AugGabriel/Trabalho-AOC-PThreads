@@ -17,7 +17,7 @@
 #define LARGURA_BLOCOS 1
 
 // Número de threads
-#define NUM_THREADS 1
+#define MAX_THREADS 8
 
 
 // Variáveis globais
@@ -339,13 +339,13 @@ int main() {
                     / (ALTURA_BLOCOS * LARGURA_BLOCOS);
     blocos_restantes = total_blocos;
 
-    pthread_t threads[NUM_THREADS];
+    pthread_t threads[MAX_THREADS];
 
-    for (int i = 0; i < NUM_THREADS && i < total_blocos; i++) {
+    for (int i = 0; i < MAX_THREADS && i < total_blocos; i++) {
         pthread_create(&(threads[i]), NULL, rotina, NULL);
     }
     
-    for (int i = 0; i < NUM_THREADS && i < total_blocos; i++) {
+    for (int i = 0; i < MAX_THREADS && i < total_blocos; i++) {
         pthread_join(threads[i], NULL);
     }
 
