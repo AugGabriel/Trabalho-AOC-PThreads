@@ -18,13 +18,17 @@
 #define ALTURA_BLOCOS 50
 #define LARGURA_BLOCOS 50
 
-// Número de threads
+
+// Gerenciamento das threads
 #define MAX_THREADS 8
+
+pthread_mutex_t mutex_cont_primos;
+pthread_mutex_t mutex_blocos_restantes;
 
 
 // Variáveis globais
-int cont_primos = 0;
 int **matriz;
+int cont_primos = 0;
 int blocos_restantes;
 
 
@@ -310,10 +314,19 @@ void *rotina(void *param) {
     // Quantidade de macroblocos que cabem horizontalmente (um do lado do outro) na matriz
     int quant_blocos_horizontal = LARGURA_MATRIZ / LARGURA_BLOCOS;
 
-    while (blocos_restantes > 0) {
+    while (1) {
+        // Acesso à variável global `blocos_restantes`
+        pthread_mutex_lock(&mutex_blocos_restantes);
+
+        if (blocos_restantes < 0) {
+            pthread_mutex_unlock(&mutex_blocos_restantes);
+            break;
+        }
+
         int indice_bloco = --blocos_restantes;
-        printf("Bloco %d alocado\n", indice_bloco);
-        
+        pthread_mutex_unlock(&mutex_blocos_restantes);
+
+        // Nenhum acesso a variáveis globais        
         int indice_x = indice_bloco % quant_blocos_horizontal;
         int indice_y = indice_bloco / quant_blocos_horizontal;
         
@@ -323,9 +336,14 @@ void *rotina(void *param) {
         int posicao_inicial_y = indice_y * ALTURA_BLOCOS;
         int posicao_final_y = posicao_inicial_y + ALTURA_BLOCOS;
         
+        // Acesso à variável global `cont_primos`
+        pthread_mutex_lock(&mutex_cont_primos);
+
         cont_primos += contar_primos(
             matriz, posicao_inicial_x, posicao_final_x, posicao_inicial_y, posicao_final_y
         );
+        
+        pthread_mutex_unlock(&mutex_cont_primos);
     }
         
     pthread_exit(0);
@@ -342,33 +360,26 @@ int main() {
                     / (ALTURA_BLOCOS * LARGURA_BLOCOS);
     blocos_restantes = total_blocos;
 
+    pthread_mutex_init(&mutex_cont_primos, NULL);
+    pthread_mutex_init(&mutex_blocos_restantes, NULL);
+
+    // Variáveis locais
     pthread_t threads[MAX_THREADS];
 
-    struct timespec start, end;
-
-    clock_gettime(CLOCK_MONOTONIC, &start);
-
+    // Processamento
     for (int i = 0; i < MAX_THREADS && i < total_blocos; i++) {
         pthread_create(&(threads[i]), NULL, rotina, NULL);
-        printf("Thread %d criada\n", i);
     }
     
     for (int i = 0; i < MAX_THREADS && i < total_blocos; i++) {
         pthread_join(threads[i], NULL);
     }
-
-    clock_gettime(CLOCK_MONOTONIC, &end);
-    
-    printf("--------------------\n");
-    printf("Contagem de números primos: %d\n", cont_primos);
-
-    double elapsed = (end.tv_sec - start.tv_sec)
-                   + (end.tv_nsec - start.tv_nsec) / 1e9;
-
-    printf("Elapsed: %.6f seconds\n", elapsed);
     
     // Liberações
     liberar_matriz_int(ALTURA_MATRIZ, LARGURA_MATRIZ, matriz);
+
+    pthread_mutex_destroy(&mutex_cont_primos);
+    pthread_mutex_destroy(&mutex_blocos_restantes);
 
     // Retorno
     return 0;
