@@ -10,11 +10,11 @@
     "** Erro: numeros de linhas e de colunas devem ser maiores que 0 **\n"
 
 // Alturas e larguras da matriz e dos macro blocos.
-#define ALTURA_MATRIZ 6
-#define LARGURA_MATRIZ 6
+#define ALTURA_MATRIZ 9
+#define LARGURA_MATRIZ 9
 
-#define ALTURA_BLOCOS 6
-#define LARGURA_BLOCOS 6
+#define ALTURA_BLOCOS 9
+#define LARGURA_BLOCOS 1
 
 // Número de threads
 #define NUM_THREADS 9
@@ -23,7 +23,7 @@
 // Variáveis globais
 int cont_primos = 0;
 int **matriz;
-int blocos_livres;
+int blocos_restantes;
 
 
 // Funções
@@ -288,25 +288,40 @@ int contar_primos(
 
 
 /**
- * @brief A rotina para ser passada para a thread, que efetivamente conta a quantidade de primos no macrobloco especificado.
- * 
- * Obtém a posição inicial do macrobloco a partir da quantidade de blocos livres, e conta a quantidade de primos no macrobloco.
- * 
- * A posição inicial é obtida pelo índex do macrobloco. Esse índice é ordenado dando prioridade à linha, depois à coluna, nesse seguinte modelo:
- * ├───┬───┐
- * | 1 | 2 |
- * ├───┼───|
- * | 3 | 4 |
- * └───┴───|
+ * @brief Rotina executada por cada thread para contar os números primos de um macrobloco.
+ *
+ * A partir do índice do macrobloco, calcula sua posição inicial (considerando a quantidade de blocos livres) e conta quantos números primos ele contém.
+ *
+ * Os macroblocos são indexados em ordem de linha: primeiro por linha, depois por coluna, seguindo o seguinte modelo:
+ *
+ * ┌───┬───┐
+ * │ 1 │ 2 │
+ * ├───┼───┤
+ * │ 3 │ 4 │
+ * └───┴───┘
  */
 void *rotina(void *param) {
-    int indice_bloco = --blocos_livres;
+    int indice_bloco = --blocos_restantes;
 
-    int x = (indice_bloco % (LARGURA_MATRIZ / LARGURA_BLOCOS)) * LARGURA_BLOCOS;
-    int y = (indice_bloco / (ALTURA_MATRIZ / ALTURA_BLOCOS)) * ALTURA_BLOCOS;
+    // Quantidade de macroblocos que cabem horizontalmente (um do lado do outro) na matriz
+    int quant_blocos_horizontal = LARGURA_MATRIZ / LARGURA_BLOCOS;
+
+    int indice_x = indice_bloco % quant_blocos_horizontal;
+    int indice_y = indice_bloco / quant_blocos_horizontal;
+
+    int posicao_inicial_x = indice_x * LARGURA_BLOCOS;
+    int posicao_final_x = posicao_inicial_x + LARGURA_BLOCOS;
+
+    int posicao_inicial_y = indice_y * ALTURA_BLOCOS;
+    int posicao_final_y = posicao_inicial_y + ALTURA_BLOCOS;
+
+    printf("---------------------\n");
+    printf("Indice do bloco: %d\n", indice_bloco);
+    printf("Indice x do bloco: %d\n", indice_x);
+    printf("Indice y do bloco: %d\n", indice_y);
 
     cont_primos += contar_primos(
-        matriz, x, x + LARGURA_BLOCOS, y, y + ALTURA_BLOCOS
+        matriz, posicao_inicial_x, posicao_final_x, posicao_inicial_y, posicao_final_y
     );
 
     pthread_exit(0);
@@ -319,11 +334,11 @@ int main() {
     srand(1);
 
     matriz = gerar_matriz(ALTURA_MATRIZ, LARGURA_MATRIZ);
-    blocos_livres = (ALTURA_MATRIZ * LARGURA_MATRIZ) \
+    blocos_restantes = (ALTURA_MATRIZ * LARGURA_MATRIZ) \
                     / (ALTURA_BLOCOS * LARGURA_BLOCOS);
 
     // Corpo
-    while (blocos_livres > 0) {
+    while (blocos_restantes > 0) {
         pthread_t thread;
         pthread_create(&thread, NULL, rotina, NULL);
         pthread_join(thread, NULL);
