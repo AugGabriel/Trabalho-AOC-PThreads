@@ -12,8 +12,8 @@
 
 
 // Alturas e larguras da matriz e dos macro blocos.
-#define ALTURA_MATRIZ 500
-#define LARGURA_MATRIZ 500
+#define ALTURA_MATRIZ 10000
+#define LARGURA_MATRIZ 10000
 
 #define ALTURA_BLOCOS 50
 #define LARGURA_BLOCOS 50
@@ -282,7 +282,7 @@ int contar_primos(
         );
         printf("Coordenadas iniciais: %d, %d\n", x_inicio, y_inicio);
         printf("Coordenadas limite: %d, %d\n", x_limite, y_limite);
-        
+
         exit(EXIT_FAILURE);
     }
 
@@ -325,7 +325,7 @@ void *rotina(void *param) {
         // Acesso à variável global `blocos_restantes`
         pthread_mutex_lock(&mutex_blocos_restantes);
 
-        if (blocos_restantes < 0) {
+        if (blocos_restantes <= 0) {
             pthread_mutex_unlock(&mutex_blocos_restantes);
             break;
         }
@@ -381,6 +381,9 @@ int main() {
     for (int i = 0; i < MAX_THREADS && i < total_blocos; i++) {
         pthread_join(threads[i], NULL);
     }
+
+    // Saída
+    printf("Contagem de números primos: %d\n", cont_primos);
     
     // Liberações
     liberar_matriz_int(ALTURA_MATRIZ, LARGURA_MATRIZ, matriz);

@@ -1,2 +1,2 @@
-De repente, implementar encerramentos de execução ao invés de printf em alguns casos de erro de função
+Adicionar leitura concorrente, resolvendo o problema dos leitores e escritores
 calloc -> malloc
