@@ -10,14 +10,14 @@
     "** Erro: numeros de linhas e de colunas devem ser maiores que 0 **\n"
 
 // Alturas e larguras da matriz e dos macro blocos.
-#define ALTURA_MATRIZ 9
-#define LARGURA_MATRIZ 9
+#define ALTURA_MATRIZ 500
+#define LARGURA_MATRIZ 500
 
-#define ALTURA_BLOCOS 9
+#define ALTURA_BLOCOS 1
 #define LARGURA_BLOCOS 1
 
 // Número de threads
-#define NUM_THREADS 9
+#define NUM_THREADS 1
 
 
 // Variáveis globais
@@ -301,29 +301,26 @@ int contar_primos(
  * └───┴───┘
  */
 void *rotina(void *param) {
-    int indice_bloco = --blocos_restantes;
-
     // Quantidade de macroblocos que cabem horizontalmente (um do lado do outro) na matriz
     int quant_blocos_horizontal = LARGURA_MATRIZ / LARGURA_BLOCOS;
 
-    int indice_x = indice_bloco % quant_blocos_horizontal;
-    int indice_y = indice_bloco / quant_blocos_horizontal;
-
-    int posicao_inicial_x = indice_x * LARGURA_BLOCOS;
-    int posicao_final_x = posicao_inicial_x + LARGURA_BLOCOS;
-
-    int posicao_inicial_y = indice_y * ALTURA_BLOCOS;
-    int posicao_final_y = posicao_inicial_y + ALTURA_BLOCOS;
-
-    printf("---------------------\n");
-    printf("Indice do bloco: %d\n", indice_bloco);
-    printf("Indice x do bloco: %d\n", indice_x);
-    printf("Indice y do bloco: %d\n", indice_y);
-
-    cont_primos += contar_primos(
-        matriz, posicao_inicial_x, posicao_final_x, posicao_inicial_y, posicao_final_y
-    );
-
+    while (blocos_restantes > 0) {
+        int indice_bloco = --blocos_restantes;
+        
+        int indice_x = indice_bloco % quant_blocos_horizontal;
+        int indice_y = indice_bloco / quant_blocos_horizontal;
+        
+        int posicao_inicial_x = indice_x * LARGURA_BLOCOS;
+        int posicao_final_x = posicao_inicial_x + LARGURA_BLOCOS;
+        
+        int posicao_inicial_y = indice_y * ALTURA_BLOCOS;
+        int posicao_final_y = posicao_inicial_y + ALTURA_BLOCOS;
+        
+        cont_primos += contar_primos(
+            matriz, posicao_inicial_x, posicao_final_x, posicao_inicial_y, posicao_final_y
+        );
+    }
+        
     pthread_exit(0);
 }
 
@@ -334,14 +331,18 @@ int main() {
     srand(1);
 
     matriz = gerar_matriz(ALTURA_MATRIZ, LARGURA_MATRIZ);
-    blocos_restantes = (ALTURA_MATRIZ * LARGURA_MATRIZ) \
+    int total_blocos = (ALTURA_MATRIZ * LARGURA_MATRIZ) \
                     / (ALTURA_BLOCOS * LARGURA_BLOCOS);
+    blocos_restantes = total_blocos;
 
-    // Corpo
-    while (blocos_restantes > 0) {
-        pthread_t thread;
-        pthread_create(&thread, NULL, rotina, NULL);
-        pthread_join(thread, NULL);
+    pthread_t threads[NUM_THREADS];
+
+    for (int i = 0; i < NUM_THREADS && i < total_blocos; i++) {
+        pthread_create(&(threads[i]), NULL, rotina, NULL);
+    }
+    
+    for (int i = 0; i < NUM_THREADS && i < total_blocos; i++) {
+        pthread_join(threads[i], NULL);
     }
 
     printf("Contagem de números primos: %d\n", cont_primos);
