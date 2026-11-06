@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 // Mensagens de erro
 #define ERRO_ALOCACAO_MEMORIA \
@@ -9,12 +10,13 @@
 #define ERRO_LINHAS_COLUNAS_NAO_POSITIVO \
     "** Erro: numeros de linhas e de colunas devem ser maiores que 0 **\n"
 
+
 // Alturas e larguras da matriz e dos macro blocos.
 #define ALTURA_MATRIZ 500
 #define LARGURA_MATRIZ 500
 
-#define ALTURA_BLOCOS 1
-#define LARGURA_BLOCOS 1
+#define ALTURA_BLOCOS 50
+#define LARGURA_BLOCOS 50
 
 // Número de threads
 #define MAX_THREADS 8
@@ -310,6 +312,7 @@ void *rotina(void *param) {
 
     while (blocos_restantes > 0) {
         int indice_bloco = --blocos_restantes;
+        printf("Bloco %d alocado\n", indice_bloco);
         
         int indice_x = indice_bloco % quant_blocos_horizontal;
         int indice_y = indice_bloco / quant_blocos_horizontal;
@@ -341,15 +344,28 @@ int main() {
 
     pthread_t threads[MAX_THREADS];
 
+    struct timespec start, end;
+
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
     for (int i = 0; i < MAX_THREADS && i < total_blocos; i++) {
         pthread_create(&(threads[i]), NULL, rotina, NULL);
+        printf("Thread %d criada\n", i);
     }
     
     for (int i = 0; i < MAX_THREADS && i < total_blocos; i++) {
         pthread_join(threads[i], NULL);
     }
 
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    
+    printf("--------------------\n");
     printf("Contagem de números primos: %d\n", cont_primos);
+
+    double elapsed = (end.tv_sec - start.tv_sec)
+                   + (end.tv_nsec - start.tv_nsec) / 1e9;
+
+    printf("Elapsed: %.6f seconds\n", elapsed);
     
     // Liberações
     liberar_matriz_int(ALTURA_MATRIZ, LARGURA_MATRIZ, matriz);
