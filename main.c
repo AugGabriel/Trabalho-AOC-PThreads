@@ -288,10 +288,14 @@ int contar_primos(
 
 
 /**
- * @brief Rotina executada por cada thread para contar os números primos de um macrobloco.
+ * @brief Rotina executada por cada thread. Enquanto houver blocos não contabilizados, ela designa um bloco para si mesma, e conta a quantidade de primos nele.
  *
- * A partir do índice do macrobloco, calcula sua posição inicial (considerando a quantidade de blocos livres) e conta quantos números primos ele contém.
- *
+ * Enquanto ainda há trabalho para executar, a função designa para si mesma um macrobloco, 
+ * recebendo o seu índice enquanto decrementa a quantidade de blocos disponíveis.
+ * 
+ * Depois, a função calcula as coordenadas inicial e final do bloco, chama a função auxiliar para contar a quantidade de números primos no macrobloco, 
+ * e incrementa o contador de primos global.
+ * 
  * Os macroblocos são indexados em ordem de linha: primeiro por linha, depois por coluna, seguindo o seguinte modelo:
  *
  * ┌───┬───┐
