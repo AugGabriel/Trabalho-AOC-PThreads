@@ -12,11 +12,11 @@
 
 
 // Alturas e larguras da matriz e dos macro blocos.
-#define ALTURA_MATRIZ 7000
-#define LARGURA_MATRIZ 7000
+#define ALTURA_MATRIZ 1000
+#define LARGURA_MATRIZ 1000
 
-#define ALTURA_BLOCOS 100
-#define LARGURA_BLOCOS 100
+#define ALTURA_BLOCOS 500
+#define LARGURA_BLOCOS 500
 
 
 // Macros function-like
@@ -30,14 +30,17 @@
 
 
 // Gerenciamento das threads
-#define MAX_THREADS 80
+#define MAX_THREADS 8
 
 pthread_mutex_t mutex_cont_primos;
 pthread_mutex_t mutex_blocos_restantes;
 
 
-// Variáveis globais
+// Variáveis globais que não serão alteradas pelas execuções
 int **matriz;
+int total_blocos;
+
+// Variáveis globais que serão alteradas pelas execuções
 int cont_primos;
 int blocos_restantes;
 
@@ -122,20 +125,6 @@ void verificar_tamanhos_matriz_macroblocos() {
     if (erro_encontrado) {
         exit(EXIT_FAILURE);
     }
-}
-
-
-/**
- * @brief Inicializa/reinicia as variáveis globais que podem sofrer alteração durante a execução.
- * 
- * Uma vez que algumas variáveis globais podem sofrer alteração pelas duas execuções, essa função seta os valores corretos para essas variáveis
- * antes da execução serial, e entre a serial e a paralela.
- * 
- * @param total_blocos O total de macroblocos que será usado, que também será o número inicial de blocos restantes.
- */
-void inicializar_variaveis_globais(int total_blocos) {
-    cont_primos = 0;
-    blocos_restantes = total_blocos;
 }
 
 
@@ -343,10 +332,12 @@ void *rotina(void *param) {
             break;
         }
 
-        int indice_bloco = --blocos_restantes;
+        int blocos_restantes_local = blocos_restantes--;        // Note que a atribuição acontece antes do decremento
         pthread_mutex_unlock(&mutex_blocos_restantes);
 
-        // Nenhum acesso a variáveis globais        
+        // Nenhum acesso a variáveis globais alteradas pelas execuções
+        int indice_bloco = total_blocos - blocos_restantes_local;
+
         int index_bloco_eixo_y = indice_bloco / quant_blocos_horizontal;     // Índex do bloco no eixo X
         int index_bloco_eixo_x = indice_bloco % quant_blocos_horizontal;     // Índex do bloco no eixo Y
         
@@ -380,12 +371,11 @@ int main() {
     srand(1);
 
     matriz = gerar_matriz(ALTURA_MATRIZ, LARGURA_MATRIZ);
-
-    int total_blocos = \
+    cont_primos = 0;
+    total_blocos = \
         (ALTURA_MATRIZ * LARGURA_MATRIZ) \
         / (ALTURA_BLOCOS * LARGURA_BLOCOS);
-
-    inicializar_variaveis_globais(total_blocos);
+    blocos_restantes = total_blocos;
 
     pthread_mutex_init(&mutex_cont_primos, NULL);
     pthread_mutex_init(&mutex_blocos_restantes, NULL);
@@ -394,13 +384,13 @@ int main() {
     struct timespec inicio_serial, fim_serial;
 
     clock_gettime(CLOCK_MONOTONIC, &inicio_serial);
-    cont_primos += contar_primos(matriz, 0, ALTURA_MATRIZ, 0, LARGURA_MATRIZ);
+    cont_primos = contar_primos(matriz, 0, ALTURA_MATRIZ, 0, LARGURA_MATRIZ);
     clock_gettime(CLOCK_MONOTONIC, &fim_serial);
 
     printf("Contagem serial de números primos: %d\n", cont_primos);
 
     // ===== Reinicialização de variáveis globais =====
-    inicializar_variaveis_globais(total_blocos);
+    cont_primos = 0;
     
     // ===== Processamento paralelo =====
     pthread_t threads[MAX_THREADS];

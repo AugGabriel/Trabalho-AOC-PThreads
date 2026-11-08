@@ -1,1 +1,6 @@
 Validar o que foi feito com o documento do professor
+Testar com o visual studio
+Revisar docs
+
+
+Notas: não podemos garantir que a thread N recebe o bloco N sempre, mesmo considerando o número de threads seja igual o número de blocos. Isso porque as threads simplesmente buscam o próximo bloco quando elas terminam seu trabalho.
