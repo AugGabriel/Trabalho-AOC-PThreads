@@ -332,7 +332,7 @@ void *rotina(void *param) {
  * 
  * @return O tempo de execução apenas da contagem de número de primos da matriz.
  */
-double contagem_serial() {
+double contagem_serial(void) {
     struct timespec inicio, fim;
 
     clock_gettime(CLOCK_MONOTONIC, &inicio);
@@ -341,11 +341,8 @@ double contagem_serial() {
 
     printf("Contagem serial de números primos: %d\n", cont_primos);
 
-    return \
-        (double)(
-            (fim.tv_sec - inicio.tv_sec) + (fim.tv_nsec - inicio.tv_nsec)
-        )
-        / 1e9;
+    return (double)(fim.tv_sec - inicio.tv_sec)
+     + (double)(fim.tv_nsec - inicio.tv_nsec) / 1e9;
 }
 
 
@@ -356,7 +353,7 @@ double contagem_serial() {
  * 
  * @return O tempo de execução apenas da contagem de número de primos da matriz.
  */
-double contagem_paralela() {
+double contagem_paralela(void) {
     pthread_t threads[MAX_THREADS];
 
     struct timespec inicio, fim;
@@ -382,15 +379,12 @@ double contagem_paralela() {
     clock_gettime(CLOCK_MONOTONIC, &fim);
     printf("Contagem paralela de números primos: %d\n", cont_primos);
 
-    return \
-        (double)(
-            (fim.tv_sec - inicio.tv_sec) + (fim.tv_nsec - inicio.tv_nsec)
-        )
-        / 1e9;
+    return (double)(fim.tv_sec - inicio.tv_sec)
+     + (double)(fim.tv_nsec - inicio.tv_nsec) / 1e9;
 }
 
 
-int main() {
+int main(void) {
     // ===== Inicializações =====
     srand(1);
 
