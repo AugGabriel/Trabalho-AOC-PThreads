@@ -19,6 +19,16 @@
 #define LARGURA_BLOCOS 100
 
 
+// Macros function-like
+
+/**
+ * @brief Gera um número aleatório de 0 a 31999.
+ * 
+ * Gera um inteiro aleatório e retorna o resto da divisão dele por 32000.
+ */
+#define GERAR_NUMERO (rand() % 32000)
+
+
 // Gerenciamento das threads
 #define MAX_THREADS 8
 
@@ -162,18 +172,6 @@ int eh_primo(int entrada) {
 
 
 /**
- * @brief Gera um número aleatório de 0 a 31999.
- * 
- * Gera um inteiro aleatório e retorna o resto da divisão dele por 32000.
- * 
- * @return O número aleatório gerado.
- */
-int gerar_numero() {
-    return rand() % 32000;
-}
-
-
-/**
  * @brief Cria uma matriz de inteiros com tamanho parametrizado.
  * 
  * Recebe os números de linhas e de colunas, e verifica os seus valores. 
@@ -253,7 +251,7 @@ void liberar_matriz_int(int linhas, int colunas, int **matriz)
  * @brief Gera uma matriz de números aleatórios com tamanho parametrizado.
  * 
  * Aloca uma matriz usando o auxiliar `alocar_matriz_int`, e verifica se ela foi alocada com sucesso. 
- * Depois, itera por ela, preenchendo com números inteiros aleatórios, usando o auxiliar `gerar_numero`.
+ * Depois, itera por ela, preenchendo com números inteiros aleatórios, usando o auxiliar `GERAR_NUMERO`.
  * 
  * @param linhas O número de linhas da matriz;
  * @param colunas O número de colunas da matriz;
@@ -264,7 +262,7 @@ int **gerar_matriz(int linhas, int colunas) {
 
     for (int i = 0; i < linhas; i++) {
         for (int j = 0; j < colunas; j++) {
-            matriz[i][j] = gerar_numero();
+            matriz[i][j] = GERAR_NUMERO;
         }
     }
 
@@ -376,7 +374,7 @@ void *rotina(void *param) {
 
 
 int main() {
-    // Inicializações
+    // ===== Inicializações =====
     verificar_tamanhos_matriz_macroblocos();
     srand(1);
 
@@ -391,17 +389,17 @@ int main() {
     pthread_mutex_init(&mutex_cont_primos, NULL);
     pthread_mutex_init(&mutex_blocos_restantes, NULL);
 
-    // Processamento serial
+    // ===== Processamento serial =====
     struct timespec inicio_serial, fim_serial;
 
     clock_gettime(CLOCK_MONOTONIC, &inicio_serial);
     cont_primos += contar_primos(matriz, 0, LARGURA_MATRIZ, 0, ALTURA_MATRIZ);
     clock_gettime(CLOCK_MONOTONIC, &fim_serial);
 
-    // Reinicialização de variáveis globais
+    // ===== Reinicialização de variáveis globais =====
     inicializar_variaveis_globais(total_blocos);
     
-    // Processamento paralelo
+    // ===== Processamento paralelo =====
     pthread_t threads[MAX_THREADS];
 
     struct timespec inicio_paralelo, fim_paralelo;
@@ -417,7 +415,7 @@ int main() {
     
     clock_gettime(CLOCK_MONOTONIC, &fim_paralelo);
 
-    // Saída
+    // ===== Saída =====
     double tempo_serial = \
         (fim_serial.tv_sec - inicio_serial.tv_sec)
         + (fim_serial.tv_nsec - inicio_serial.tv_nsec)
@@ -435,12 +433,12 @@ int main() {
     printf("Tempo paralelo: %.4f\n", tempo_paralelo);
     printf("Speedup: %.2fx\n", tempo_serial / tempo_paralelo);
     
-    // Liberações
+    // ===== Liberações =====
     liberar_matriz_int(ALTURA_MATRIZ, LARGURA_MATRIZ, matriz);
 
     pthread_mutex_destroy(&mutex_cont_primos);
     pthread_mutex_destroy(&mutex_blocos_restantes);
 
-    // Retorno
+    // ===== Retorno =====
     return 0;
 }
