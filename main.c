@@ -365,7 +365,14 @@ void *rotina(void *param) {
 }
 
 
-double busca_serial() {
+/**
+ * @brief Efetua a contagem serial de números primos, e retorna o tempo de processamento.
+ * 
+ * Registra os tempos de início e de fim, realiza a contagem de primos, imprime o valor contabilizado e retorna o tempo da execução.
+ * 
+ * @return O tempo de execução apenas da contagem de número de primos da matriz.
+ */
+double contagem_serial() {
     struct timespec inicio, fim;
 
     clock_gettime(CLOCK_MONOTONIC, &inicio);
@@ -381,7 +388,14 @@ double busca_serial() {
 }
 
 
-double busca_paralela() {
+/**
+ * @brief Efetua a contagem paralela de números primos, e retorna o tempo de processamento.
+ * 
+ * Registra os tempos de início e de fim, realiza a contagem de primos em macroblocos, imprime o valor contabilizado e retorna o tempo da execução.
+ * 
+ * @return O tempo de execução apenas da contagem de número de primos da matriz.
+ */
+double contagem_paralela() {
     pthread_t threads[MAX_THREADS];
 
     struct timespec inicio, fim;
@@ -423,17 +437,17 @@ int main() {
     double tempo_serial = -1, tempo_paralelo = -1;
 
     // ===== Processamento serial =====
-    tempo_serial = busca_serial();
+    tempo_serial = contagem_serial();
 
     // ===== Reinicialização de variáveis globais =====
     cont_primos = 0;
     
     // ===== Processamento paralelo =====
-    tempo_paralelo = busca_paralela();
+    tempo_paralelo = contagem_paralela();
 
     // ===== Resultados =====
-    pritnf("\n-------------------------\n");
-    
+    printf("\n-------------------------\n");
+
     if (tempo_serial >= 0) {
         printf("Tempo serial: %.4f\n", tempo_serial);
     }
@@ -443,6 +457,8 @@ int main() {
     if (tempo_serial >= 0 && tempo_paralelo >= 0){
         printf("Speedup: %.2fx\n", tempo_serial / tempo_paralelo);
     }
+
+    printf("-------------------------\n");
     
     // ===== Liberações =====
     liberar_matriz_int(ALTURA_MATRIZ, LARGURA_MATRIZ, matriz);
