@@ -1,1 +1,1 @@
-Adicionar leitura concorrente, resolvendo depois o problema dos leitores e escritores
+Validar o que foi feito com o documento do professor
