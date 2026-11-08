@@ -1,2 +1,1 @@
-Adicionar leitura concorrente, resolvendo o problema dos leitores e escritores
-calloc -> malloc
+Adicionar leitura concorrente, resolvendo depois o problema dos leitores e escritores

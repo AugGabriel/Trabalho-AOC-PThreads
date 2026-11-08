@@ -30,7 +30,7 @@
 
 
 // Gerenciamento das threads
-#define MAX_THREADS 8
+#define MAX_THREADS 80
 
 pthread_mutex_t mutex_cont_primos;
 pthread_mutex_t mutex_blocos_restantes;
@@ -192,7 +192,7 @@ int **alocar_matriz_int(int linhas, int colunas) {
     }
     
     // Alocação das linhas da matriz
-    int **matriz = calloc(linhas, sizeof(int*));        // Vetor de ponteiros para int
+    int **matriz = malloc(linhas * sizeof(int*));        // Vetor de ponteiros para int
 
     if (matriz == NULL) {
         printf(ERRO_ALOCACAO_MEMORIA);
@@ -201,7 +201,7 @@ int **alocar_matriz_int(int linhas, int colunas) {
 
     // Alocação das colunas da matriz
     for (int i = 0; i < linhas; i++) {
-        matriz[i] = calloc(colunas, sizeof(int));       // Vetores de valores do tipo int
+        matriz[i] = malloc(colunas * sizeof(int));       // Vetores de valores do tipo int
 
         if (matriz[i] == NULL) {
             printf(ERRO_ALOCACAO_MEMORIA);
@@ -396,6 +396,8 @@ int main() {
     cont_primos += contar_primos(matriz, 0, LARGURA_MATRIZ, 0, ALTURA_MATRIZ);
     clock_gettime(CLOCK_MONOTONIC, &fim_serial);
 
+    printf("Contagem serial de números primos: %d\n", cont_primos);
+
     // ===== Reinicialização de variáveis globais =====
     inicializar_variaveis_globais(total_blocos);
     
@@ -414,8 +416,9 @@ int main() {
     }
     
     clock_gettime(CLOCK_MONOTONIC, &fim_paralelo);
+    printf("Contagem paralela de números primos: %d\n", cont_primos);
 
-    // ===== Saída =====
+    // ===== Resultados =====
     double tempo_serial = \
         (fim_serial.tv_sec - inicio_serial.tv_sec)
         + (fim_serial.tv_nsec - inicio_serial.tv_nsec)
@@ -426,10 +429,7 @@ int main() {
         + (fim_paralelo.tv_nsec - inicio_paralelo.tv_nsec) 
         / 1e9;
 
-    printf("Contagem serial de números primos: %d\n", cont_primos);
-    printf("Contagem paralela de números primos: %d\n", cont_primos);
-    
-    printf("Tempo serial: %.4f\n", tempo_serial);
+    printf("\nTempo serial: %.4f\n", tempo_serial);
     printf("Tempo paralelo: %.4f\n", tempo_paralelo);
     printf("Speedup: %.2fx\n", tempo_serial / tempo_paralelo);
     
