@@ -342,14 +342,18 @@ void *rotina(void *param) {
         
         int posicao_inicial_y = indice_y * ALTURA_BLOCOS;
         int posicao_final_y = posicao_inicial_y + ALTURA_BLOCOS;
+
+        int primos_bloco = contar_primos(
+            matriz,
+            posicao_inicial_x,
+            posicao_final_x,
+            posicao_inicial_y,
+            posicao_final_y
+        );
         
         // Acesso à variável global `cont_primos`
         pthread_mutex_lock(&mutex_cont_primos);
-
-        cont_primos += contar_primos(
-            matriz, posicao_inicial_x, posicao_final_x, posicao_inicial_y, posicao_final_y
-        );
-        
+        cont_primos += primos_bloco;
         pthread_mutex_unlock(&mutex_cont_primos);
     }
         
