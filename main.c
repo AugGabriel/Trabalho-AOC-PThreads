@@ -274,35 +274,35 @@ int **gerar_matriz(int linhas, int colunas) {
 /** 
  * @brief Conta o número de primos no macrobloco da matriz, retornando a quantidade.
  * 
- * Dadas as coordenadas de início do macrobloco (inclusivo) e as coordenadas limite (exclusivo), retorna a quantidade de números primos no macrobloco.
+ * Dadas as posições de início e as posições limite do macrobloco, retorna a quantidade de números primos contidos nele.
  * 
  * @param matriz O ponteiro para a matriz de inteiros;
- * @param x_inicio A coordenada x de início do macrobloco (inclusivo);
- * @param x_limite A coordenada x limite do macrobloco (exclusivo);
- * @param y_inicio A coordenada y de início do macrobloco (inclusivo);
- * @param y_limite A coordenada y limite do macrobloco (exclusivo);
+ * @param i_inicio A posição i de início do macrobloco (inclusivo);
+ * @param i_limite A posição i limite do macrobloco (exclusivo);
+ * @param j_inicio A posição j de início do macrobloco (inclusivo);
+ * @param j_limite A posição j limite do macrobloco (exclusivo);
  * @return A contagem de números primos na matriz contidos no macrobloco.
  */
 int contar_primos(
     int **matriz, 
-    int x_inicio, int x_limite,
-    int y_inicio, int y_limite
+    int i_inicio, int i_limite,
+    int j_inicio, int j_limite
 ) {
-    if (x_inicio < 0 || x_limite < 0 || y_inicio < 0 || y_limite < 0) {
+    if (i_inicio < 0 || i_limite < 0 || j_inicio < 0 || j_limite < 0) {
         printf(
             "Todas as entradas de inteiro da função `contar_primos` precisam ser"
             " positivas. Valores: \n"
         );
-        printf("Coordenadas iniciais: %d, %d\n", x_inicio, y_inicio);
-        printf("Coordenadas limite: %d, %d\n", x_limite, y_limite);
+        printf("Posição inicial: %d, %d\n", i_inicio, j_inicio);
+        printf("Posição limite: %d, %d\n", i_limite, j_limite);
 
         exit(EXIT_FAILURE);
     }
 
     int contador = 0;
 
-    for (int i = x_inicio; i < x_limite; i++) {
-        for (int j = y_inicio; j < y_limite; j++) {
+    for (int i = i_inicio; i < i_limite; i++) {
+        for (int j = j_inicio; j < j_limite; j++) {
             if (eh_primo(matriz[i][j])) {
                 contador++;
             }
@@ -347,21 +347,21 @@ void *rotina(void *param) {
         pthread_mutex_unlock(&mutex_blocos_restantes);
 
         // Nenhum acesso a variáveis globais        
-        int indice_x = indice_bloco % quant_blocos_horizontal;
-        int indice_y = indice_bloco / quant_blocos_horizontal;
+        int index_bloco_eixo_y = indice_bloco / quant_blocos_horizontal;     // Índex do bloco no eixo X
+        int index_bloco_eixo_x = indice_bloco % quant_blocos_horizontal;     // Índex do bloco no eixo Y
         
-        int posicao_inicial_x = indice_x * LARGURA_BLOCOS;
-        int posicao_final_x = posicao_inicial_x + LARGURA_BLOCOS;
+        int i_inicio = index_bloco_eixo_y * ALTURA_BLOCOS;
+        int i_fim = i_inicio + ALTURA_BLOCOS;
         
-        int posicao_inicial_y = indice_y * ALTURA_BLOCOS;
-        int posicao_final_y = posicao_inicial_y + ALTURA_BLOCOS;
+        int j_inicio = index_bloco_eixo_x * LARGURA_BLOCOS;
+        int j_fim = j_inicio + LARGURA_BLOCOS;
 
         int primos_bloco = contar_primos(
             matriz,
-            posicao_inicial_x,
-            posicao_final_x,
-            posicao_inicial_y,
-            posicao_final_y
+            i_inicio,
+            i_fim,
+            j_inicio,
+            j_fim
         );
         
         // Acesso à variável global `cont_primos`
