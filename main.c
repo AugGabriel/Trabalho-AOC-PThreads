@@ -162,7 +162,9 @@ int eh_primo(int entrada) {
         return 1;
     }
 
-    for (int divisor = 2; divisor <= ceil(sqrt(entrada)); divisor++) {
+    int raiz_entrada = ceil(sqrt(entrada));
+
+    for (int divisor = 2; divisor <= raiz_entrada; divisor++) {
         if (entrada % divisor == 0) {
             return 0;
         }
