@@ -37,7 +37,7 @@ pthread_mutex_t mutex_blocos_restantes;
 
 
 // Variáveis globais que não serão alteradas pelas execuções
-int **matriz;
+int **matriz_global;
 int total_blocos;
 
 // Variáveis globais que serão alteradas pelas execuções
@@ -50,7 +50,7 @@ int blocos_restantes;
 /**
  * @brief Verifica se as dimensões da matriz e dos macroblocos são válidos.
  * 
- * Verifica se todas as dimensões são positivas, e se as dimensões dos macroblocos são menores que e divisíveis pelas dimensões da matriz.
+ * Verifica se todas as dimensões são positivas, e se as dimensões da matriz são maiores que e divisíveis pelas dimensões dos macroblocos.
  */
 void verificar_tamanhos_matriz_macroblocos() {
     int erro_encontrado = 0;
@@ -151,7 +151,7 @@ int eh_primo(int entrada) {
         return 1;
     }
 
-    int raiz_entrada = ceil(sqrt(entrada));
+    int raiz_entrada = (int)ceil(sqrt(entrada));
 
     for (int divisor = 2; divisor <= raiz_entrada; divisor++) {
         if (entrada % divisor == 0) {
@@ -222,12 +222,12 @@ void liberar_matriz_int(int linhas, int colunas, int **matriz)
     // Verificação das entradas
     if (matriz == NULL) {
         printf("** Erro: matriz nao definida **\n");
-        exit(EXIT_FAILURE);;
+        exit(EXIT_FAILURE);
     }
 
     if (linhas < 1 || colunas < 1) {
         printf(ERRO_LINHAS_COLUNAS_NAO_POSITIVO);
-        exit(EXIT_FAILURE);;
+        exit(EXIT_FAILURE);
     }
 
     // Liberação da matriz
@@ -338,8 +338,8 @@ void *rotina(void *param) {
         // Nenhum acesso a variáveis globais alteradas pelas execuções
         int indice_bloco = total_blocos - blocos_restantes_local;
 
-        int index_bloco_eixo_y = indice_bloco / quant_blocos_horizontal;     // Índex do bloco no eixo X
-        int index_bloco_eixo_x = indice_bloco % quant_blocos_horizontal;     // Índex do bloco no eixo Y
+        int index_bloco_eixo_y = indice_bloco / quant_blocos_horizontal;     // Índex do bloco no eixo Y
+        int index_bloco_eixo_x = indice_bloco % quant_blocos_horizontal;     // Índex do bloco no eixo X
         
         int i_inicio = index_bloco_eixo_y * ALTURA_BLOCOS;
         int i_fim = i_inicio + ALTURA_BLOCOS;
@@ -348,7 +348,7 @@ void *rotina(void *param) {
         int j_fim = j_inicio + LARGURA_BLOCOS;
 
         int primos_bloco = contar_primos(
-            matriz,
+            matriz_global,
             i_inicio,
             i_fim,
             j_inicio,
@@ -376,7 +376,7 @@ double contagem_serial() {
     struct timespec inicio, fim;
 
     clock_gettime(CLOCK_MONOTONIC, &inicio);
-    cont_primos = contar_primos(matriz, 0, ALTURA_MATRIZ, 0, LARGURA_MATRIZ);
+    cont_primos = contar_primos(matriz_global, 0, ALTURA_MATRIZ, 0, LARGURA_MATRIZ);
     clock_gettime(CLOCK_MONOTONIC, &fim);
 
     printf("Contagem serial de números primos: %d\n", cont_primos);
@@ -402,7 +402,16 @@ double contagem_paralela() {
     clock_gettime(CLOCK_MONOTONIC, &inicio);
     
     for (int i = 0; i < MAX_THREADS && i < total_blocos; i++) {
-        pthread_create(&(threads[i]), NULL, rotina, NULL);
+        int retorno = pthread_create(&threads[i], NULL, rotina, NULL);
+
+        if (retorno != 0) {
+            printf(
+                "** Erro: falha ao criar thread %d (codigo de retorno %d) **\n", 
+                i, 
+                retorno
+            );
+            exit(EXIT_FAILURE);
+        }
     }
     
     for (int i = 0; i < MAX_THREADS && i < total_blocos; i++) {
@@ -424,7 +433,7 @@ int main() {
     verificar_tamanhos_matriz_macroblocos();
     srand(1);
 
-    matriz = gerar_matriz(ALTURA_MATRIZ, LARGURA_MATRIZ);
+    matriz_global = gerar_matriz(ALTURA_MATRIZ, LARGURA_MATRIZ);
     cont_primos = 0;
     total_blocos = \
         (ALTURA_MATRIZ * LARGURA_MATRIZ) \
@@ -461,7 +470,7 @@ int main() {
     printf("-------------------------\n");
     
     // ===== Liberações =====
-    liberar_matriz_int(ALTURA_MATRIZ, LARGURA_MATRIZ, matriz);
+    liberar_matriz_int(ALTURA_MATRIZ, LARGURA_MATRIZ, matriz_global);
 
     pthread_mutex_destroy(&mutex_cont_primos);
     pthread_mutex_destroy(&mutex_blocos_restantes);
