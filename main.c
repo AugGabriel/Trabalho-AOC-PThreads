@@ -12,11 +12,11 @@
 
 
 // Alturas e larguras da matriz e dos macro blocos.
-#define ALTURA_MATRIZ 10000
-#define LARGURA_MATRIZ 10000
+#define ALTURA_MATRIZ 7000
+#define LARGURA_MATRIZ 7000
 
-#define ALTURA_BLOCOS 50
-#define LARGURA_BLOCOS 50
+#define ALTURA_BLOCOS 100
+#define LARGURA_BLOCOS 100
 
 
 // Gerenciamento das threads
@@ -28,7 +28,7 @@ pthread_mutex_t mutex_blocos_restantes;
 
 // Variáveis globais
 int **matriz;
-int cont_primos = 0;
+int cont_primos;
 int blocos_restantes;
 
 
@@ -112,6 +112,20 @@ void verificar_tamanhos_matriz_macroblocos() {
     if (erro_encontrado) {
         exit(EXIT_FAILURE);
     }
+}
+
+
+/**
+ * @brief Inicializa/reinicia as variáveis globais que podem sofrer alteração durante a execução.
+ * 
+ * Uma vez que algumas variáveis globais podem sofrer alteração pelas duas execuções, essa função seta os valores corretos para essas variáveis
+ * antes da execução serial, e entre a serial e a paralela.
+ * 
+ * @param total_blocos O total de macroblocos que será usado, que também será o número inicial de blocos restantes.
+ */
+void inicializar_variaveis_globais(int total_blocos) {
+    cont_primos = 0;
+    blocos_restantes = total_blocos;
 }
 
 
@@ -367,17 +381,32 @@ int main() {
     srand(1);
 
     matriz = gerar_matriz(ALTURA_MATRIZ, LARGURA_MATRIZ);
-    int total_blocos = (ALTURA_MATRIZ * LARGURA_MATRIZ) \
-                    / (ALTURA_BLOCOS * LARGURA_BLOCOS);
-    blocos_restantes = total_blocos;
+
+    int total_blocos = \
+        (ALTURA_MATRIZ * LARGURA_MATRIZ) \
+        / (ALTURA_BLOCOS * LARGURA_BLOCOS);
+
+    inicializar_variaveis_globais(total_blocos);
 
     pthread_mutex_init(&mutex_cont_primos, NULL);
     pthread_mutex_init(&mutex_blocos_restantes, NULL);
 
-    // Variáveis locais
+    // Processamento serial
+    struct timespec inicio_serial, fim_serial;
+
+    clock_gettime(CLOCK_MONOTONIC, &inicio_serial);
+    cont_primos += contar_primos(matriz, 0, LARGURA_MATRIZ, 0, ALTURA_MATRIZ);
+    clock_gettime(CLOCK_MONOTONIC, &fim_serial);
+
+    // Reinicialização de variáveis globais
+    inicializar_variaveis_globais(total_blocos);
+    
+    // Processamento paralelo
     pthread_t threads[MAX_THREADS];
 
-    // Processamento
+    struct timespec inicio_paralelo, fim_paralelo;
+    clock_gettime(CLOCK_MONOTONIC, &inicio_paralelo);
+    
     for (int i = 0; i < MAX_THREADS && i < total_blocos; i++) {
         pthread_create(&(threads[i]), NULL, rotina, NULL);
     }
@@ -385,9 +414,26 @@ int main() {
     for (int i = 0; i < MAX_THREADS && i < total_blocos; i++) {
         pthread_join(threads[i], NULL);
     }
+    
+    clock_gettime(CLOCK_MONOTONIC, &fim_paralelo);
 
     // Saída
-    printf("Contagem de números primos: %d\n", cont_primos);
+    double tempo_serial = \
+        (fim_serial.tv_sec - inicio_serial.tv_sec)
+        + (fim_serial.tv_nsec - inicio_serial.tv_nsec)
+        / 1e9;
+
+    double tempo_paralelo = \
+        (fim_paralelo.tv_sec - inicio_paralelo.tv_sec)
+        + (fim_paralelo.tv_nsec - inicio_paralelo.tv_nsec) 
+        / 1e9;
+
+    printf("Contagem serial de números primos: %d\n", cont_primos);
+    printf("Contagem paralela de números primos: %d\n", cont_primos);
+    
+    printf("Tempo serial: %.4f\n", tempo_serial);
+    printf("Tempo paralelo: %.4f\n", tempo_paralelo);
+    printf("Speedup: %.2fx\n", tempo_serial / tempo_paralelo);
     
     // Liberações
     liberar_matriz_int(ALTURA_MATRIZ, LARGURA_MATRIZ, matriz);

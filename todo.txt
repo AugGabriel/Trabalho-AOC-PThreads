@@ -1,2 +1,4 @@
+Função de inicialização de variáveis globais
+Transformar a geração de número aleatório em macro
 Adicionar leitura concorrente, resolvendo o problema dos leitores e escritores
 calloc -> malloc
