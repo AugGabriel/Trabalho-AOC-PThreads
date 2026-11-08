@@ -365,6 +365,46 @@ void *rotina(void *param) {
 }
 
 
+double busca_serial() {
+    struct timespec inicio, fim;
+
+    clock_gettime(CLOCK_MONOTONIC, &inicio);
+    cont_primos = contar_primos(matriz, 0, ALTURA_MATRIZ, 0, LARGURA_MATRIZ);
+    clock_gettime(CLOCK_MONOTONIC, &fim);
+
+    printf("Contagem serial de números primos: %d\n", cont_primos);
+
+    return \
+        (fim.tv_sec - inicio.tv_sec)
+        + (fim.tv_nsec - inicio.tv_nsec)
+        / 1e9;
+}
+
+
+double busca_paralela() {
+    pthread_t threads[MAX_THREADS];
+
+    struct timespec inicio, fim;
+    clock_gettime(CLOCK_MONOTONIC, &inicio);
+    
+    for (int i = 0; i < MAX_THREADS && i < total_blocos; i++) {
+        pthread_create(&(threads[i]), NULL, rotina, NULL);
+    }
+    
+    for (int i = 0; i < MAX_THREADS && i < total_blocos; i++) {
+        pthread_join(threads[i], NULL);
+    }
+    
+    clock_gettime(CLOCK_MONOTONIC, &fim);
+    printf("Contagem paralela de números primos: %d\n", cont_primos);
+
+    return \
+        (fim.tv_sec - inicio.tv_sec)
+        + (fim.tv_nsec - inicio.tv_nsec) 
+        / 1e9;
+}
+
+
 int main() {
     // ===== Inicializações =====
     verificar_tamanhos_matriz_macroblocos();
@@ -380,49 +420,29 @@ int main() {
     pthread_mutex_init(&mutex_cont_primos, NULL);
     pthread_mutex_init(&mutex_blocos_restantes, NULL);
 
+    double tempo_serial = -1, tempo_paralelo = -1;
+
     // ===== Processamento serial =====
-    struct timespec inicio_serial, fim_serial;
-
-    clock_gettime(CLOCK_MONOTONIC, &inicio_serial);
-    cont_primos = contar_primos(matriz, 0, ALTURA_MATRIZ, 0, LARGURA_MATRIZ);
-    clock_gettime(CLOCK_MONOTONIC, &fim_serial);
-
-    printf("Contagem serial de números primos: %d\n", cont_primos);
+    tempo_serial = busca_serial();
 
     // ===== Reinicialização de variáveis globais =====
     cont_primos = 0;
     
     // ===== Processamento paralelo =====
-    pthread_t threads[MAX_THREADS];
-
-    struct timespec inicio_paralelo, fim_paralelo;
-    clock_gettime(CLOCK_MONOTONIC, &inicio_paralelo);
-    
-    for (int i = 0; i < MAX_THREADS && i < total_blocos; i++) {
-        pthread_create(&(threads[i]), NULL, rotina, NULL);
-    }
-    
-    for (int i = 0; i < MAX_THREADS && i < total_blocos; i++) {
-        pthread_join(threads[i], NULL);
-    }
-    
-    clock_gettime(CLOCK_MONOTONIC, &fim_paralelo);
-    printf("Contagem paralela de números primos: %d\n", cont_primos);
+    tempo_paralelo = busca_paralela();
 
     // ===== Resultados =====
-    double tempo_serial = \
-        (fim_serial.tv_sec - inicio_serial.tv_sec)
-        + (fim_serial.tv_nsec - inicio_serial.tv_nsec)
-        / 1e9;
-
-    double tempo_paralelo = \
-        (fim_paralelo.tv_sec - inicio_paralelo.tv_sec)
-        + (fim_paralelo.tv_nsec - inicio_paralelo.tv_nsec) 
-        / 1e9;
-
-    printf("\nTempo serial: %.4f\n", tempo_serial);
-    printf("Tempo paralelo: %.4f\n", tempo_paralelo);
-    printf("Speedup: %.2fx\n", tempo_serial / tempo_paralelo);
+    pritnf("\n-------------------------\n");
+    
+    if (tempo_serial >= 0) {
+        printf("Tempo serial: %.4f\n", tempo_serial);
+    }
+    if (tempo_paralelo >= 0) {
+        printf("Tempo paralelo: %.4f\n", tempo_paralelo);
+    }
+    if (tempo_serial >= 0 && tempo_paralelo >= 0){
+        printf("Speedup: %.2fx\n", tempo_serial / tempo_paralelo);
+    }
     
     // ===== Liberações =====
     liberar_matriz_int(ALTURA_MATRIZ, LARGURA_MATRIZ, matriz);
