@@ -237,8 +237,8 @@ int contar_primos(
 ) {
     if (i_inicio < 0 || i_limite < 0 || j_inicio < 0 || j_limite < 0) {
         printf(
-            "Todas as entradas de inteiro da função `contar_primos` precisam ser"
-            " positivas. Valores: \n"
+            "As entradas de inteiro da função `contar_primos` não devem ser negativas."
+            " Valores: \n"
         );
         printf("Posição inicial: %d, %d\n", i_inicio, j_inicio);
         printf("Posição limite: %d, %d\n", i_limite, j_limite);
@@ -272,9 +272,9 @@ int contar_primos(
  * Os macroblocos são indexados em ordem de linha: primeiro por linha, depois por coluna, seguindo o seguinte modelo:
  *
  * ┌───┬───┐
- * │ 1 │ 2 │
+ * │ 0 │ 1 │
  * ├───┼───┤
- * │ 3 │ 4 │
+ * │ 2 │ 3 │
  * └───┴───┘
  */
 void *rotina(void *param) {
