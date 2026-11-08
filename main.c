@@ -394,7 +394,7 @@ int main() {
     struct timespec inicio_serial, fim_serial;
 
     clock_gettime(CLOCK_MONOTONIC, &inicio_serial);
-    cont_primos += contar_primos(matriz, 0, LARGURA_MATRIZ, 0, ALTURA_MATRIZ);
+    cont_primos += contar_primos(matriz, 0, ALTURA_MATRIZ, 0, LARGURA_MATRIZ);
     clock_gettime(CLOCK_MONOTONIC, &fim_serial);
 
     printf("Contagem serial de números primos: %d\n", cont_primos);
