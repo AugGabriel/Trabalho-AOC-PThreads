@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <limits.h>
 
 // Mensagens de erro
 #define ERRO_ALOCACAO_MEMORIA \
@@ -12,11 +13,11 @@
 
 
 // Alturas e larguras da matriz e dos macro blocos.
-#define ALTURA_MATRIZ 1000
-#define LARGURA_MATRIZ 1000
+#define ALTURA_MATRIZ 10000
+#define LARGURA_MATRIZ 10000
 
-#define ALTURA_BLOCOS 500
-#define LARGURA_BLOCOS 500
+#define ALTURA_BLOCOS 100
+#define LARGURA_BLOCOS 100
 
 
 // Macros function-like
@@ -45,88 +46,45 @@ int cont_primos;
 int blocos_restantes;
 
 
+// ===== Validação das dimensões =====
+
+// Dimensões positivas para os blocos e para a matriz
+#if ALTURA_MATRIZ <= 0
+#error "Erro: a altura da matriz deve ser maior que zero"
+#endif
+#if LARGURA_MATRIZ <= 0
+#error "Erro: a largura da matriz deve ser maior que zero"
+#endif
+#if ALTURA_BLOCOS <= 0
+#error "Erro: a altura dos macroblocos deve ser maior que zero"
+#endif
+#if LARGURA_BLOCOS <= 0
+#error "Erro: a largura dos macroblocos deve ser maior que zero"
+#endif
+
+// Dimensões da matriz maiores ou iguais às dimensões dos blocos
+#if ALTURA_BLOCOS > ALTURA_MATRIZ
+#error "Erro: a altura dos macroblocos deve ser menor ou igual a altura da matriz"
+#endif
+#if LARGURA_BLOCOS > LARGURA_MATRIZ
+#error "Erro: a largura dos macroblocos deve ser menor ou igual a largura da matriz"
+#endif
+
+// Blocos encaixam na matriz sem sobras
+#if ALTURA_MATRIZ % ALTURA_BLOCOS != 0
+#error "Erro: a altura da matriz deve ser divisivel pela altura dos macroblocos"
+#endif
+#if LARGURA_MATRIZ % LARGURA_BLOCOS != 0
+#error "Erro: a largura da matriz deve ser divisivel pela largura dos macroblocos"
+#endif
+
+// Evita overflow de int no total de elementos (o valor dessa multiplicação é usado para calcular o total de blocos)
+#if ALTURA_MATRIZ > INT_MAX / LARGURA_MATRIZ
+#error "Erro: ALTURA_MATRIZ * LARGURA_MATRIZ excede INT_MAX"
+#endif
+
+
 // Funções
-
-/**
- * @brief Verifica se as dimensões da matriz e dos macroblocos são válidos.
- * 
- * Verifica se todas as dimensões são positivas, e se as dimensões da matriz são maiores que e divisíveis pelas dimensões dos macroblocos.
- */
-void verificar_tamanhos_matriz_macroblocos() {
-    int erro_encontrado = 0;
-
-    // Verificação de tamanhos maiores que zero
-    if (ALTURA_MATRIZ <= 0) {
-        printf(
-            "** Erro: a altura da matriz deve ser maior que zero **\n"
-        );
-        erro_encontrado = 1;
-    }
-    if (LARGURA_MATRIZ <= 0) {
-        printf(
-            "** Erro: a largura da matriz deve ser maior que zero **\n"
-        );
-        erro_encontrado = 1;
-    }
-
-    if (ALTURA_BLOCOS <= 0) {
-        printf(
-            "** Erro: a altura dos macroblocos deve ser maior que zero **\n"
-        );
-        erro_encontrado = 1;
-    }
-    if (LARGURA_BLOCOS <= 0) {
-        printf(
-            "** Erro: a largura dos macroblocos deve ser maior que zero **\n"
-        );
-        erro_encontrado = 1;
-    }
-
-    if (erro_encontrado) {
-        exit(EXIT_FAILURE);
-    }
-
-    // Verificação de dimensões do bloco maior que dimensões da matriz
-    if (ALTURA_BLOCOS > ALTURA_MATRIZ) {
-        printf(
-            "** Erro: a altura dos macroblocos deve ser menor ou igual à altura da "
-            "matriz**\n"
-        );
-        erro_encontrado = 1;
-    }
-    if (LARGURA_BLOCOS > LARGURA_MATRIZ) {
-        printf(
-            "** Erro: a largura dos macroblocos deve ser menor ou igual à largura da "
-            "matriz**\n"
-        );
-        erro_encontrado = 1;
-    }
-
-    if (erro_encontrado) {
-        exit(EXIT_FAILURE);
-    }
-
-    // Verificação de dimensões do bloco divisíveis pelas dimensões da matriz
-    if (ALTURA_MATRIZ % ALTURA_BLOCOS != 0) {
-        printf(
-            "** Erro: a altura dos macroblocos deve ser divisível pela altura da "
-            "matriz**\n"
-        );
-        erro_encontrado = 1;
-    }
-    if (LARGURA_MATRIZ % LARGURA_BLOCOS != 0) {
-        printf(
-            "** Erro: a largura dos macroblocos deve ser divisível pela largura da "
-            "matriz**\n"
-        );
-        erro_encontrado = 1;
-    }
-
-    if (erro_encontrado) {
-        exit(EXIT_FAILURE);
-    }
-}
-
 
 /**
  * @brief Verifica se o número informado é primo.
@@ -183,7 +141,7 @@ int **alocar_matriz_int(int linhas, int colunas) {
     }
     
     // Alocação da linha de colunas da matriz
-    int **matriz = malloc(linhas * sizeof(int*));        // Vetor de ponteiros para int
+    int **matriz = (int**)malloc(linhas * sizeof(int*));        // Vetor de ponteiros para int
 
     if (matriz == NULL) {
         printf(ERRO_ALOCACAO_MEMORIA);
@@ -192,7 +150,7 @@ int **alocar_matriz_int(int linhas, int colunas) {
 
     // Alocação das colunas da matriz
     for (int i = 0; i < linhas; i++) {
-        matriz[i] = malloc(colunas * sizeof(int));       // Vetores de valores do tipo int
+        matriz[i] = (int*)malloc(colunas * sizeof(int));       // Vetores de valores do tipo int
 
         if (matriz[i] == NULL) {
             printf(ERRO_ALOCACAO_MEMORIA);
@@ -320,6 +278,8 @@ int contar_primos(
  * └───┴───┘
  */
 void *rotina(void *param) {
+    (void)param;
+
     // Quantidade de macroblocos que cabem horizontalmente (um do lado do outro) na matriz
     int quant_blocos_horizontal = LARGURA_MATRIZ / LARGURA_BLOCOS;
 
@@ -382,8 +342,9 @@ double contagem_serial() {
     printf("Contagem serial de números primos: %d\n", cont_primos);
 
     return \
-        (fim.tv_sec - inicio.tv_sec)
-        + (fim.tv_nsec - inicio.tv_nsec)
+        (double)(
+            (fim.tv_sec - inicio.tv_sec) + (fim.tv_nsec - inicio.tv_nsec)
+        )
         / 1e9;
 }
 
@@ -422,15 +383,15 @@ double contagem_paralela() {
     printf("Contagem paralela de números primos: %d\n", cont_primos);
 
     return \
-        (fim.tv_sec - inicio.tv_sec)
-        + (fim.tv_nsec - inicio.tv_nsec) 
+        (double)(
+            (fim.tv_sec - inicio.tv_sec) + (fim.tv_nsec - inicio.tv_nsec)
+        )
         / 1e9;
 }
 
 
 int main() {
     // ===== Inicializações =====
-    verificar_tamanhos_matriz_macroblocos();
     srand(1);
 
     matriz_global = gerar_matriz(ALTURA_MATRIZ, LARGURA_MATRIZ);
