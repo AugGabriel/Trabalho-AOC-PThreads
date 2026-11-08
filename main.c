@@ -177,8 +177,8 @@ int eh_primo(int entrada) {
  * @brief Cria uma matriz de inteiros com tamanho parametrizado.
  * 
  * Recebe os números de linhas e de colunas, e verifica os seus valores. 
- * Depois, aloca dinamicamente a memória para a matriz de inteiros com o tamanho parametrizado, com todos os valores iniciados com zero. 
- * Cada linha é um ponteiro que aponta para uma coluna.
+ * Depois, aloca dinamicamente a memória para a matriz de inteiros com o tamanho parametrizado. 
+ * Internamente, há apenas uma linha que contém os ponteiros para cada coluna.
  * 
  * @param linhas O número de linhas da matriz;
  * @param colunas O número de colunas da matriz;
@@ -193,7 +193,7 @@ int **alocar_matriz_int(int linhas, int colunas) {
         exit(EXIT_FAILURE);
     }
     
-    // Alocação das linhas da matriz
+    // Alocação da linha de colunas da matriz
     int **matriz = malloc(linhas * sizeof(int*));        // Vetor de ponteiros para int
 
     if (matriz == NULL) {
@@ -220,7 +220,7 @@ int **alocar_matriz_int(int linhas, int colunas) {
  * @brief Libera a memória de uma matriz de inteiros.
  * 
  * Recebe os números de linhas e de colunas da matriz, seguidos do próprio vetor da matriz, e checa os seus valores.
- * Depois, libera coluna por coluna da matriz, e ao final libera a própria matriz.
+ * Depois, libera coluna por coluna da matriz, e ao final libera a linha de colunas da matriz.
  * 
  * @param linhas O número de linhas da matriz;
  * @param colunas O número de colunas da matriz;
@@ -252,8 +252,7 @@ void liberar_matriz_int(int linhas, int colunas, int **matriz)
 /**
  * @brief Gera uma matriz de números aleatórios com tamanho parametrizado.
  * 
- * Aloca uma matriz usando o auxiliar `alocar_matriz_int`, e verifica se ela foi alocada com sucesso. 
- * Depois, itera por ela, preenchendo com números inteiros aleatórios, usando o auxiliar `GERAR_NUMERO`.
+ * Aloca uma matriz e inicializa suas células com números inteiros aleatórios de 0 a 31999.
  * 
  * @param linhas O número de linhas da matriz;
  * @param colunas O número de colunas da matriz;
